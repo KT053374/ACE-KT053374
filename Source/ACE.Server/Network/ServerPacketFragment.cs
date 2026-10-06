@@ -1,5 +1,4 @@
 using System;
-
 using ACE.Common.Cryptography;
 
 namespace ACE.Server.Network
@@ -10,24 +9,9 @@ namespace ACE.Server.Network
 
         public override int Length =>
             PacketFragmentHeader.HeaderSize + payload.Length;
-
-        // Internal primarily so the network tests can verify reconstruction.
-        internal ReadOnlyMemory<byte> Payload => payload;
         
         public ServerPacketFragment(ReadOnlyMemory<byte> payload)
         {
-            if (payload.Length <= 0)
-                throw new ArgumentException(
-                    "Server packet fragment cannot have an empty payload.",
-                    nameof(payload));
-
-            if (payload.Length > PacketFragment.MaxFragmentDataSize)
-                throw new ArgumentOutOfRangeException(
-                    nameof(payload),
-                    payload.Length,
-                    $"Fragment payload exceeds maximum of " +
-                    $"{PacketFragment.MaxFragmentDataSize} bytes.");
-
             this.payload = payload;
         }
 
