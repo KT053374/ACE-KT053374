@@ -13,7 +13,7 @@ namespace ACE.Server.Tests.Network
     [TestClass]
     public class MessageFragmentTests
     {
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(PacketFragment.MaxFragmentDataSize)]
         [DataRow(PacketFragment.MaxFragmentDataSize * 2)]
         public void TailSize_ExactMultipleOfMaxFragmentDataSize_UsesFullFragment(
