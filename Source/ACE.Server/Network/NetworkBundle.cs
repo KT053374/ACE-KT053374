@@ -11,7 +11,7 @@ namespace ACE.Server.Network
 
         public bool HasMoreMessages => messages.Count > 0;
 
-        private readonly Queue<GameMessage> messages = new Queue<GameMessage>();
+        private Queue<GameMessage> messages = new Queue<GameMessage>();
 
         private float clientTime = -1f;
         public float ClientTime
@@ -48,27 +48,18 @@ namespace ACE.Server.Network
 
         public bool EncryptedChecksum { get; set; }
 
-        // long prevents accounting overflow if a session ever accumulates
-        // an unusually large amount of queued outbound data
-        public long CurrentSize { get; private set; }
+        public int CurrentSize { get; private set; }
 
         public void Enqueue(GameMessage message)
         {
-            // Freezes exactly once even if this same message is subsequently
-            // queued for thousands of sessions.
-            var frozenData = message.GetFrozenData();
-            
-            CurrentSize += frozenData.Length;
+            message.GetFrozenData();            
+            CurrentSize += (int)message.Data.Length;
             messages.Enqueue(message);
         }
 
         public GameMessage Dequeue()
         {
-            var message = messages.Dequeue();
-
-            CurrentSize -= message.FrozenDataLength;
-
-            return message;
+            return messages.Dequeue();
         }
     }
 }
