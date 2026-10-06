@@ -52,7 +52,7 @@ namespace ACE.Server.Network
 
         public void Enqueue(GameMessage message)
         {
-            message.GetFrozenData();            
+            message.GetFrozenData();
             CurrentSize += (int)message.Data.Length;
             messages.Enqueue(message);
         }
