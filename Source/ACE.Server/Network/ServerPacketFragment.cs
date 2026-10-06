@@ -6,9 +6,29 @@ namespace ACE.Server.Network
 {
     public class ServerPacketFragment : PacketFragment
     {
-        public ServerPacketFragment(byte[] data)
+        private readonly ReadOnlyMemory<byte> payload;
+
+        public override int Length =>
+            PacketFragmentHeader.HeaderSize + payload.Length;
+
+        // Internal primarily so the network tests can verify reconstruction.
+        internal ReadOnlyMemory<byte> Payload => payload;
+        
+        public ServerPacketFragment(ReadOnlyMemory<byte> payload)
         {
-            Data = data;
+            if (payload.Length <= 0)
+                throw new ArgumentException(
+                    "Server packet fragment cannot have an empty payload.",
+                    nameof(payload));
+
+            if (payload.Length > PacketFragment.MaxFragmentDataSize)
+                throw new ArgumentOutOfRangeException(
+                    nameof(payload),
+                    payload.Length,
+                    $"Fragment payload exceeds maximum of " +
+                    $"{PacketFragment.MaxFragmentDataSize} bytes.");
+
+            this.payload = payload;
         }
 
         /// <summary>
@@ -16,14 +36,20 @@ namespace ACE.Server.Network
         /// </summary>
         public uint PackAndReturnHash32(byte[] buffer, ref int offset)
         {
-            Header.Size = (ushort)(PacketFragmentHeader.HeaderSize + Data.Length);
+            Header.Size = 
+                (ushort)(PacketFragmentHeader.HeaderSize + payload.Length);
 
-            var headerHash32 = Header.PackAndReturnHash32(buffer, ref offset);
+            var headerHash32 = 
+                Header.PackAndReturnHash32(buffer, ref offset);
 
-            Buffer.BlockCopy(Data, 0, buffer, offset, Data.Length);
-            offset += Data.Length;
+            // Copies directly from our read-only view into the final packet.
+            payload.Span.CopyTo(
+                buffer.AsSpan(offset, payload.Length));
 
-            return headerHash32 + Hash32.Calculate(Data, Data.Length);
+            offset += payload.Length;
+
+            return headerHash32 + 
+                Hash32.Calculate(payload.Span, payload.Length);
         }
     }
 }
