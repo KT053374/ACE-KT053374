@@ -46,8 +46,6 @@ namespace ACE.Server.Network.GameMessages
             return snapshot;
         }
 
-        internal int FrozenDataLength => GetFrozenData().Length;
-
         protected GameMessage(GameMessageOpcode opCode, GameMessageGroup group)
         {
             Opcode = opCode;
