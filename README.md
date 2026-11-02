@@ -25,6 +25,7 @@ Extended documentation can be found on the project [Wiki](https://github.com/ACE
 * [Developing ACE](https://github.com/ACEmulator/ACE/wiki/ACE-Development)
 * [Hosting ACE](https://github.com/ACEmulator/ACE/wiki/ACE-Hosting)
 * [Content Creation](https://github.com/ACEmulator/ACE/wiki/Content-Creation)
+* [Community Mods and Tools](docs/Community-Mods.md)
 
 ## Contributions
 * Contributions in the form of issues and pull requests are welcomed and encouraged.
